@@ -34,6 +34,9 @@ import org.springframework.util.Assert;
  * one using {@link #register(Class...)} as well as for classpath scanning using
  * {@link #scan(String...)}.
  *
+ * 独立的应用程序上下文，接受带注解的类作为输入，特别是@Configuration注解，还有使用javax.inject注释的普通@Component类型和JSR-330兼容类
+ * 允许使用registering类进行逐个注册，使用scanning类进行逐个扫描
+ *
  * <p>In case of multiple {@code @Configuration} classes, @{@link Bean} methods defined in
  * later classes will override those defined in earlier classes. This can be leveraged to
  * deliberately override certain bean definitions via an extra {@code @Configuration}
