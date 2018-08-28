@@ -83,21 +83,33 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 具有自动装配能力的BeanFactory抽象类, 直接实现的子类为DefaultListableBeanFactory
+ *
  * Abstract bean factory superclass that implements default bean creation,
  * with the full capabilities specified by the {@link RootBeanDefinition} class.
  * Implements the {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
  * interface in addition to AbstractBeanFactory's {@link #createBean} method.
+ *
+ * 抽象bean工厂超类，它实现了默认的bean创建，具有RootBeanDefinition类指定的全部功能
+ * 除了AbstractBeanFactory的createBean（java.lang.Class <T>）方法之外，还实现了AutowireCapableBeanFactory接口。
  *
  * <p>Provides bean creation (with constructor resolution), property population,
  * wiring (including autowiring), and initialization. Handles runtime bean
  * references, resolves managed collections, calls initialization methods, etc.
  * Supports autowiring constructors, properties by name, and properties by type.
  *
+ * 提供bean创建（具有构造函数解析），属性填充，连线（包括自动装配）和初始化。
+ * 处理运行时bean引用，解析托管集合，调用初始化方法，支持构造方法注入，byName、byType注入
+ *
  * <p>The main template method to be implemented by subclasses is
  * {@link #resolveDependency(DependencyDescriptor, String, Set, TypeConverter)},
  * used for autowiring by type. In case of a factory which is capable of searching
  * its bean definitions, matching beans will typically be implemented through such
  * a search. For other factory styles, simplified matching algorithms can be implemented.
+ *
+ * 子类实现的主要模板方法是：
+ * AutowireCapableBeanFactory.resolveDependency（DependencyDescriptor，String，Set，TypeConverter），
+ * 用于按类型自动装配。在工厂能够搜索其bean定义的情况下，通常通过这种搜索来实现匹配bean。对于其他工厂样式，可以实现简化的匹配算法。
  *
  * <p>Note that this class does <i>not</i> assume or implement bean definition
  * registry capabilities. See {@link DefaultListableBeanFactory} for an implementation
@@ -295,6 +307,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@SuppressWarnings("unchecked")
 	public <T> T createBean(Class<T> beanClass) throws BeansException {
 		// Use prototype bean definition, to avoid registering bean as dependent bean.
+		// 使用原型bean定义，以避免将bean注册为依赖bean
 		RootBeanDefinition bd = new RootBeanDefinition(beanClass);
 		bd.setScope(SCOPE_PROTOTYPE);
 		bd.allowCaching = ClassUtils.isCacheSafe(beanClass, getBeanClassLoader());
