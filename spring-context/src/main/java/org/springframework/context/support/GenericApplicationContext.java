@@ -44,6 +44,9 @@ import org.springframework.util.Assert;
  * the {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
  * interface in order to allow for applying any bean definition readers to it.
  *
+ * 通用的ApplicationContext实现，它持有单个内部DefaultListableBeanFactory实例，并且不采用特定的bean定义格式。
+ * 实现BeanDefinitionRegistry接口，以便能够对其应用任何bean定义阅读器。
+ *
  * <p>Typical usage is to register a variety of bean definitions via the
  * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
  * interface and then call {@link #refresh()} to initialize those beans
@@ -52,10 +55,16 @@ import org.springframework.util.Assert;
  * {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor BeanFactoryPostProcessors},
  * etc).
  *
+ * 典型的用法是通过BeanDefinitionRegistry接口注册各种bean定义，然后调用
+ * AbstractApplicationContext.refresh()来使用应用程序上下文语义初始化这些bean(处理应用程序上下文感知器ApplicationContextAware、自动检测BeanFactoryPostProcessor等)。
+ *
  * <p>In contrast to other ApplicationContext implementations that create a new
  * internal BeanFactory instance for each refresh, the internal BeanFactory of
  * this context is available right from the start, to be able to register bean
  * definitions on it. {@link #refresh()} may only be called once.
+ *
+ * 与为每次刷新创建新的内部BeanFactory实例的其他ApplicationContext实现不同，此上下文的内部BeanFactory
+ * 从一开始就可用，以便能够在其上注册bean定义。refresh()只能调用一次。
  *
  * <p>Usage example:
  *
@@ -77,9 +86,15 @@ import org.springframework.util.Assert;
  * definition formats. The equivalent in a web environment is
  * {@link org.springframework.web.context.support.XmlWebApplicationContext}.
  *
+ * 对于典型的XML bean定义，只需使用ClassPathXmlApplicationContext或FileSystemXmlApplicationContext，
+ * 这更容易设置-但不灵活，因为您可以只使用标准的资源位置XML bean定义，而不是混合任意bean定义格式。
+ * 在web环境中等效的是XmlWebApplicationContext。
+ *
  * <p>For custom application context implementations that are supposed to read
  * special bean definition formats in a refreshable manner, consider deriving
  * from the {@link AbstractRefreshableApplicationContext} base class.
+ *
+ * 对于可刷新的方式读取特殊bean定义格式的自定义应用程序上下文实现，请考虑从AbstractRefreshableApplicationContext基类派生。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -111,6 +126,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
+	 * 使用指定的DefaultListableBeanFactory创建一个新的GenericApplicationContext
 	 * Create a new GenericApplicationContext with the given DefaultListableBeanFactory.
 	 * @param beanFactory the DefaultListableBeanFactory instance to use for this context
 	 * @see #registerBeanDefinition
@@ -122,6 +138,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
+	 * 使用给定的父对象创建一个新的GenericApplicationContext
 	 * Create a new GenericApplicationContext with the given parent.
 	 * @param parent the parent application context
 	 * @see #registerBeanDefinition
@@ -180,6 +197,10 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
+	 * 为这个上下文设置一个ResourceLoader。如果设置了，上下文将把所有getResource调用委托给给定的ResourceLoader。
+	 * 如果没有设置，将应用默认的资源加载。指定自定义ResourceLoader的主要原因是以一种特定的方式解析资源路径(没有URL前缀)。
+	 * 默认行为是解析类路径位置等路径。要将资源路径解析为文件系统位置，请在此处指定一个FileSystemResourceLoader。您还可
+	 * 以传入一个完整的ResourcePatternResolver，它将由上下文自动检测并用于getResources调用。否则，将应用默认的资源模式匹配。
 	 * Set a ResourceLoader to use for this context. If set, the context will
 	 * delegate all {@code getResource} calls to the given ResourceLoader.
 	 * If not set, default resource loading will apply.
@@ -254,6 +275,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	//---------------------------------------------------------------------
 
 	/**
+	 * 什么也不做:我们拥有一个内部BeanFactory，并依赖调用者通过我们的公共方法(或BeanFactory)注册bean
 	 * Do nothing: We hold a single internal BeanFactory and rely on callers
 	 * to register beans through our public methods (or the BeanFactory's).
 	 * @see #registerBeanDefinition
@@ -357,6 +379,8 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	//---------------------------------------------------------------------
 
 	/**
+	 * 从给定的bean类中注册一个bean，使用给定的供应商来获得一个新的实例(通常声明为lambda表达式或方法引用)，
+	 * 或者定制它的bean定义元数据(同样通常声明为lambda表达式或方法引用)
 	 * Register a bean from the given bean class, optionally customizing its
 	 * bean definition metadata (typically declared as a lambda expression
 	 * or method reference).
@@ -371,6 +395,8 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
+	 * 使用给定的供应商，从给定的bean类注册一个bean获得一个新实例(通常声明为lambda表达式或)
+	 * 方法引用)，可选地定制其bean定义元数据 (同样，通常声明为lambda表达式或方法引用)。
 	 * Register a bean from the given bean class, using the given supplier for
 	 * obtaining a new instance (typically declared as a lambda expression or
 	 * method reference), optionally customizing its bean definition metadata
@@ -387,6 +413,8 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
+	 * 使用给定的供应商，从给定的bean类注册一个bean获得一个新实例(通常声明为lambda表达式或)
+	 * 方法引用)，可选地定制其bean定义元数据 (同样，通常声明为lambda表达式或方法引用)。
 	 * Register a bean from the given bean class, using the given supplier for
 	 * obtaining a new instance (typically declared as a lambda expression or
 	 * method reference), optionally customizing its bean definition metadata

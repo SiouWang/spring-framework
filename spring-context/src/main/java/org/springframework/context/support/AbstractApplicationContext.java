@@ -87,6 +87,8 @@ import org.springframework.util.ReflectionUtils;
  * implements common context functionality. Uses the Template Method design pattern,
  * requiring concrete subclasses to implement abstract methods.
  *
+ * ApplicationContext接口的抽象实现。不强制配置使用的存储类型;简单地实现公共上下文功能。使用模板方法设计模式，需要具体的子类来实现抽象方法。
+ *
  * <p>In contrast to a plain BeanFactory, an ApplicationContext is supposed
  * to detect special beans defined in its internal bean factory:
  * Therefore, this class automatically registers
@@ -94,6 +96,13 @@ import org.springframework.util.ReflectionUtils;
  * {@link org.springframework.beans.factory.config.BeanPostProcessor BeanPostProcessors}
  * and {@link org.springframework.context.ApplicationListener ApplicationListeners}
  * which are defined as beans in the context.
+ *
+ * 与普通的BeanFactory不同，ApplicationContext应该检测其内部bean工厂中定义的特殊bean:
+ * 因此，这个类自动注册
+ * {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor BeanFactoryPostProcessors},
+ * {@link org.springframework.beans.factory.config.BeanPostProcessor BeanPostProcessors}
+ * {@link org.springframework.context.ApplicationListener ApplicationListeners}
+ * 它们在上下文中定义为bean。
  *
  * <p>A {@link org.springframework.context.MessageSource} may also be supplied
  * as a bean in the context, with the name "messageSource"; otherwise, message
@@ -103,12 +112,21 @@ import org.springframework.util.ReflectionUtils;
  * in the context; otherwise, a default multicaster of type
  * {@link org.springframework.context.event.SimpleApplicationEventMulticaster} will be used.
  *
+ * MessageSource也可以作为上下文中的bean提供，名称为“MessageSource”;
+ * 否则，消息解析将委托给父上下文。此外，应用程序事件的多处理器可以作为上下文中的applicationEventMulticaster类型的
+ * {@link org.springframework.context.event.ApplicationEventMulticaster}提供;
+ * 否则，将使用
+ * {@link org.springframework.context.event.SimpleApplicationEventMulticaster}
+ *
  * <p>Implements resource loading through extending
  * {@link org.springframework.core.io.DefaultResourceLoader}.
  * Consequently treats non-URL resource paths as class path resources
  * (supporting full class path resource names that include the package path,
  * e.g. "mypackage/myresource.dat"), unless the {@link #getResourceByPath}
  * method is overwritten in a subclass.
+ *
+ * 通过扩展DefaultResourceLoader实现资源加载。因此，将非url资源路径视为类路径资源
+ * (支持包含包路径的完整类路径资源名称，例如。除非DefaultResourceLoader.getResourceByPath(java.lang.String)方法在子类中被覆盖。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -518,14 +536,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Prepare this context for refreshing.
 			prepareRefresh();
 
-			// Tell the subclass to refresh the internal bean factory.
+			// 告诉子类刷新内部bean工厂 Tell the subclass to refresh the internal bean factory.
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			// Prepare the bean factory for use in this context.
+			// 准备好bean工厂，以便在此上下文中使用 Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				// 允许在context子类中对beanFactory进行post-processing(后置处理)
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
@@ -580,10 +599,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * Prepare this context for refreshing, setting its startup date and
 	 * active flag as well as performing any initialization of property sources.
+	 * 为这个context刷新做预处理、设置它的启动日期和活动标志以及执行所有属性源的初始化
 	 */
 	protected void prepareRefresh() {
+		// 设置启动时间
 		this.startupDate = System.currentTimeMillis();
+		// 是否关闭
 		this.closed.set(false);
+		// 是否活动
 		this.active.set(true);
 
 		if (logger.isInfoEnabled()) {
@@ -591,12 +614,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment
+		// 在上下文环境中初始化所有占位符属性源（子类实现）
 		initPropertySources();
 
+		// 验证所有标记为必需的属性都是可解析的
 		// Validate that all properties marked as required are resolvable
 		// see ConfigurablePropertyResolver#setRequiredProperties
 		getEnvironment().validateRequiredProperties();
 
+		// 允许收集早期的ApplicationEvents，在multicaster可用后发布…
 		// Allow for the collection of early ApplicationEvents,
 		// to be published once the multicaster is available...
 		this.earlyApplicationEvents = new LinkedHashSet<>();
