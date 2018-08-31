@@ -19,6 +19,12 @@ package org.springframework.beans.factory.config;
 import org.springframework.beans.BeansException;
 
 /**
+ *
+ * 允许定制修改应用程序上下文的bean定义，调整上下文的基础bean工厂的bean属性值。
+ * 应用程序上下文可以在bean定义中自动检测BeanFactoryPostProcessor bean，并在创建其他bean之前应用它们。
+ * BeanFactoryPostProcessor可以与bean定义进行交互和修改，但绝不会与bean实例交互
+ * 如果需要bean实例交互，请考虑实现BeanPostProcessor。
+ *
  * Allows for custom modification of an application context's bean definitions,
  * adapting the bean property values of the context's underlying bean factory.
  *
